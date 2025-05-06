@@ -40,7 +40,7 @@ struct AICoachView: View {
 
         do {
             let (data, _) = try await URLSession.shared.data(for: request)
-            let result = try JSONDecoder().decode(AIResponse.self, from: data)
+            let result = try JSONDecoder().decode(AlanResponseDTO.self, from: data)
             return result.content
         } catch {
             return "에러: \(error.localizedDescription)"

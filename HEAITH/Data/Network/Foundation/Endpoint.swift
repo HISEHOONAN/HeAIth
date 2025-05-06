@@ -52,6 +52,7 @@ protocol ResponseRequestable : Requestable{
 }
 
 extension Requestable{
+    
     func url(with config: NetworkConfigurable) throws -> URL {
         let baseURLString = config.baseURL.absoluteString.hasSuffix("/") ? config.baseURL.absoluteString : config.baseURL.absoluteString + "/"
         let endpoint = baseURLString + path
@@ -62,13 +63,11 @@ extension Requestable{
         
         var allQueryItems = [URLQueryItem]()
         
-        // Add queryParameters from Encodable or dictionary
         let combinedQueryParameters = (try? queryParametersEncodable?.toDictionary()) ?? queryParameters
         combinedQueryParameters.forEach {
             allQueryItems.append(URLQueryItem(name: $0.key, value: "\($0.value)"))
         }
         
-        // Add global config query parameters
         config.queryParameters.forEach {
             allQueryItems.append(URLQueryItem(name: $0.key, value: "\($0.value)"))
         }
@@ -90,12 +89,10 @@ extension Requestable{
         
         // 헤더가 있을때만 넣어주세용.
 //        var allHeaders = config.headers
-        // (You can add self.headerParameters here if needed)
         
 //        request.allHTTPHeaderFields = allHeaders
         request.httpMethod = method.rawValue
         
-        // Set body if needed
         let combinedBodyParameters = (try? bodyParametersEncodable?.toDictionary()) ?? bodyParameters
         if !combinedBodyParameters.isEmpty {
             request.httpBody = bodyEncoder.encode(combinedBodyParameters)

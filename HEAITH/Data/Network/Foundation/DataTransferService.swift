@@ -5,11 +5,9 @@
 //  Created by 안세훈 on 5/5/25.
 //
 
-//MARK: - 4) DataTransferService: NetworkService에서 불리는 request를 wrapping하여, response로 받은 Data형을 decode시키는 모듈
-
 import Foundation
 
-// MARK: - Base
+// MARK: - 4) DataTransferService: NetworkService에서 불리는 request를 wrapping하여, response로 받은 Data형을 decode시키는 모듈
 
 public enum DataTransferError: Error {
     case noResponse
@@ -18,7 +16,6 @@ public enum DataTransferError: Error {
     case resolvedNetworkFailure(Error)
 }
 
-/// Request에서 error응답을 받은 경우의 처리하는 protocol
 public protocol DataTransferErrorResolver {
     func resolve(error: NetworkError) -> Error
 }
@@ -30,7 +27,6 @@ public class DefaultDataTransferErrorResolver: DataTransferErrorResolver {
     }
 }
 
-/// 언아카이빙: Response로 온 Data형을 struct형으로 변경하는 protocol
 public protocol ResponseDecoder {
     func decode<T: Decodable>(_ data: Data) throws -> T
 }
@@ -72,18 +68,19 @@ public final class DefaultDataTransferErrorLogger: DataTransferErrorLogger {
     }
 }
 
-public protocol DataTransferService {
+protocol DataTransferService {
     typealias CompletionHandler<T> = (Result<T, DataTransferError>) -> Void
 
     @discardableResult
     func request<T: Decodable, E: ResponseRequestable>(with endpoint: E,
                                                        completion: @escaping CompletionHandler<T>) -> NetworkCancellable? where E.Response == T
+    
     @discardableResult
     func request<E: ResponseRequestable>(with endpoint: E,
                                          completion: @escaping CompletionHandler<Void>) -> NetworkCancellable? where E.Response == Void
 }
 
-public final class DefaultDataTransferService {
+final class DefaultDataTransferService {
 
     private let networkService: NetworkService
     private let errorResolver: DataTransferErrorResolver
@@ -107,11 +104,11 @@ extension DefaultDataTransferService: DataTransferService {
             switch result {
             case .success(let data):
                 let result: Result<T, DataTransferError> = self.decode(data: data, decoder: endpoint.responseDecoder)
-                DispatchQueue.main.async { return completion(result) }
+                DispatchQueue.main.async { completion(result) }
             case .failure(let error):
                 self.errorLogger.log(error: error)
-                let error = self.resolve(networkError: error)
-                DispatchQueue.main.async { return completion(.failure(error)) }
+                let resolvedError = self.resolve(networkError: error)
+                DispatchQueue.main.async { completion(.failure(resolvedError)) }
             }
         }
     }
@@ -120,16 +117,15 @@ extension DefaultDataTransferService: DataTransferService {
         return self.networkService.request(endpoint: endpoint) { result in
             switch result {
             case .success:
-                DispatchQueue.main.async { return completion(.success(())) }
+                DispatchQueue.main.async { completion(.success(())) }
             case .failure(let error):
                 self.errorLogger.log(error: error)
-                let error = self.resolve(networkError: error)
-                DispatchQueue.main.async { return completion(.failure(error)) }
+                let resolvedError = self.resolve(networkError: error)
+                DispatchQueue.main.async { completion(.failure(resolvedError)) }
             }
         }
     }
 
-    // MARK: - Private
     private func decode<T: Decodable>(data: Data?, decoder: ResponseDecoder) -> Result<T, DataTransferError> {
         do {
             guard let data = data else { return .failure(.noResponse) }

@@ -8,7 +8,7 @@
 import Foundation
 
 //MARK: - 네트워크 에러 타입.
-public enum NetworkError : Error{
+public enum NetworkError : Error {
     case error(statusCode: Int, data: Data?)
     case notConnected
     case cancelled
@@ -25,17 +25,5 @@ extension NetworkError {
             return code == codeError
         default: return false
         }
-    }
-}
-
-extension Dictionary where Key == String {
-    func prettyPrint() -> String {
-        var string: String = ""
-        if let data = try? JSONSerialization.data(withJSONObject: self, options: .prettyPrinted) {
-            if let nstr = NSString(data: data, encoding: String.Encoding.utf8.rawValue) {
-                string = nstr as String
-            }
-        }
-        return string
     }
 }
