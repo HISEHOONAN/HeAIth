@@ -11,17 +11,13 @@ import Foundation
 
 public protocol NetworkConfigurable {
     var baseURL: URL { get }
-    //    var headers : [String : String] { get }
+//    var headers: [String: String] { get } 헤더입니다.
     var queryParameters: [String: Any] { get }
 }
 
+
 public struct ApiDataNetworkConfig : NetworkConfigurable {
-    public var baseURL: URL
-    //    public let headers : [String : String] = [:]
-    public var queryParameters: [String : Any]
-    
-    public init(baseURL: URL, queryParameters: [String : Any]) {
-        self.baseURL = baseURL
-        self.queryParameters = queryParameters
-    }
+    public var baseURL: URL { URL(string: "https://kdt-api-function.azurewebsites.net")! }
+    public var queryParameters: [String : Any] { [:] }
 }
+

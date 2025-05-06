@@ -29,9 +29,7 @@ struct BodyEncoderImpl : BodyEncoder {
 
 protocol Requestable {
     var path: String { get }
-//    var isFullPath: Bool { get }
     var method: HTTPMethod { get }
-//    var headerParameters: [String: String] { get }
     var queryParametersEncodable: Encodable? { get }
     var queryParameters: [String: Any] { get }
     var bodyParametersEncodable: Encodable? { get }
@@ -49,18 +47,102 @@ enum RequestGenerationError: Error {
 
 protocol ResponseRequestable : Requestable{
     associatedtype Response
+    
     var responseDecoder: ResponseDecoder { get }
 }
 
 extension Requestable{
-    func url(with config: NetworkConfigurable) throws -> URL{
-        let baseURL = config.baseURL
-        return
+    func url(with config: NetworkConfigurable) throws -> URL {
+        let baseURLString = config.baseURL.absoluteString.hasSuffix("/") ? config.baseURL.absoluteString : config.baseURL.absoluteString + "/"
+        let endpoint = baseURLString + path
+        
+        guard var urlComponents = URLComponents(string: endpoint) else {
+            throw RequestGenerationError.components
+        }
+        
+        var allQueryItems = [URLQueryItem]()
+        
+        // Add queryParameters from Encodable or dictionary
+        let combinedQueryParameters = (try? queryParametersEncodable?.toDictionary()) ?? queryParameters
+        combinedQueryParameters.forEach {
+            allQueryItems.append(URLQueryItem(name: $0.key, value: "\($0.value)"))
+        }
+        
+        // Add global config query parameters
+        config.queryParameters.forEach {
+            allQueryItems.append(URLQueryItem(name: $0.key, value: "\($0.value)"))
+        }
+        
+        if !allQueryItems.isEmpty {
+            urlComponents.queryItems = allQueryItems
+        }
+        
+        guard let url = urlComponents.url else {
+            throw RequestGenerationError.components
+        }
+        
+        return url
+    }
+    
+    func urlRequest(with config: NetworkConfigurable) throws -> URLRequest {
+        let url = try self.url(with: config)
+        var request = URLRequest(url: url)
+        
+        // 헤더가 있을때만 넣어주세용.
+//        var allHeaders = config.headers
+        // (You can add self.headerParameters here if needed)
+        
+//        request.allHTTPHeaderFields = allHeaders
+        request.httpMethod = method.rawValue
+        
+        // Set body if needed
+        let combinedBodyParameters = (try? bodyParametersEncodable?.toDictionary()) ?? bodyParameters
+        if !combinedBodyParameters.isEmpty {
+            request.httpBody = bodyEncoder.encode(combinedBodyParameters)
+        }
+        
+        return request
     }
 }
 
-class Endpoint<R> : ResponseRequestable {
-    
+// MARK: - Endpoint 클래스
+class Endpoint<R>: ResponseRequestable {
     typealias Response = R
     
+    let path: String
+    let method: HTTPMethod
+    let queryParametersEncodable: Encodable?
+    let queryParameters: [String: Any]
+    let bodyParametersEncodable: Encodable?
+    let bodyParameters: [String: Any]
+    let bodyEncoder: BodyEncoder
+    let responseDecoder: ResponseDecoder
+    
+    init(path: String,
+         method: HTTPMethod,
+         queryParametersEncodable: Encodable? = nil,
+         queryParameters: [String: Any] = [:],
+         bodyParametersEncodable: Encodable? = nil,
+         bodyParameters: [String: Any] = [:],
+         bodyEncoder: BodyEncoder = BodyEncoderImpl(),
+         responseDecoder: ResponseDecoder = JSONResponseDecoder()) {
+        
+        self.path = path
+        self.method = method
+        self.queryParametersEncodable = queryParametersEncodable
+        self.queryParameters = queryParameters
+        self.bodyParametersEncodable = bodyParametersEncodable
+        self.bodyParameters = bodyParameters
+        self.bodyEncoder = bodyEncoder
+        self.responseDecoder = responseDecoder
+    }
+}
+
+// MARK: - Encodable 확장: toDictionary
+private extension Encodable {
+    func toDictionary() throws -> [String: Any]? {
+        let data = try JSONEncoder().encode(self)
+        let json = try JSONSerialization.jsonObject(with: data, options: .allowFragments)
+        return json as? [String: Any]
+    }
 }
