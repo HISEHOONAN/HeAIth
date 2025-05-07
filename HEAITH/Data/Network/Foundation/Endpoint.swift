@@ -64,6 +64,9 @@ extension Requestable{
         var allQueryItems = [URLQueryItem]()
         
         let combinedQueryParameters = (try? queryParametersEncodable?.toDictionary()) ?? queryParameters
+        
+        // ✅ client_id 자동 추가
+        
         combinedQueryParameters.forEach {
             allQueryItems.append(URLQueryItem(name: $0.key, value: "\($0.value)"))
         }
@@ -88,9 +91,9 @@ extension Requestable{
         var request = URLRequest(url: url)
         
         // 헤더가 있을때만 넣어주세용.
-//        var allHeaders = config.headers
+        //        var allHeaders = config.headers
         
-//        request.allHTTPHeaderFields = allHeaders
+        //        request.allHTTPHeaderFields = allHeaders
         request.httpMethod = method.rawValue
         
         let combinedBodyParameters = (try? bodyParametersEncodable?.toDictionary()) ?? bodyParameters
@@ -115,15 +118,16 @@ class Endpoint<R>: ResponseRequestable {
     let bodyEncoder: BodyEncoder
     let responseDecoder: ResponseDecoder
     
-    init(path: String,
-         method: HTTPMethod,
-         queryParametersEncodable: Encodable? = nil,
-         queryParameters: [String: Any] = [:],
-         bodyParametersEncodable: Encodable? = nil,
-         bodyParameters: [String: Any] = [:],
-         bodyEncoder: BodyEncoder = BodyEncoderImpl(),
-         responseDecoder: ResponseDecoder = JSONResponseDecoder()) {
-        
+    init(
+        path: String,
+        method: HTTPMethod,
+        queryParametersEncodable: Encodable? = nil,
+        queryParameters: [String: Any] = [:],
+        bodyParametersEncodable: Encodable? = nil,
+        bodyParameters: [String: Any] = [:],
+        bodyEncoder: BodyEncoder = BodyEncoderImpl(),
+        responseDecoder: ResponseDecoder = JSONResponseDecoder()
+    ) {
         self.path = path
         self.method = method
         self.queryParametersEncodable = queryParametersEncodable
@@ -141,5 +145,24 @@ private extension Encodable {
         let data = try JSONEncoder().encode(self)
         let json = try JSONSerialization.jsonObject(with: data, options: .allowFragments)
         return json as? [String: Any]
+    }
+}
+
+
+struct AlanChatEndpoint: ResponseRequestable {
+    typealias Response = AlanResponseDTO
+    
+    let path: String = "question"
+    let method: HTTPMethod = .get
+    
+    var queryParametersEncodable: Encodable? = nil
+    var queryParameters: [String: Any]
+    var bodyParametersEncodable: Encodable? = nil
+    var bodyParameters: [String: Any] = [:]
+    var bodyEncoder: BodyEncoder = BodyEncoderImpl()
+    var responseDecoder: ResponseDecoder = JSONResponseDecoder()
+    
+    init(content: String) {
+        self.queryParameters = ["content": content]
     }
 }

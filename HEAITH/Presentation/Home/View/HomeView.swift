@@ -20,7 +20,7 @@ struct HomeView: View {
 
                     WeightChartView(data: viewModel.chartData)
 
-                    NavigationLink(destination: AICoachChatView(viewModel: AICoachViewModel())) {
+                    NavigationLink(destination: AICoachView()) {
                         AICoachButtonView()
                     }
 

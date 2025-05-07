@@ -22,6 +22,7 @@ extension NetworkError {
     public func hasStatusCode(_ codeError: Int) -> Bool {
         switch self {
         case let .error(code, _):
+            print(code)
             return code == codeError
         default: return false
         }

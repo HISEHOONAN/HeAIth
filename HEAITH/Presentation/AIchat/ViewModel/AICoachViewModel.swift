@@ -11,21 +11,27 @@ import Observation
 
 @Observable
 class AICoachViewModel {
-    var messages: [String] = ["AI: 운동 계획을 도와드릴까요?"]
+    var messages: [(String, Bool)] = []
     var input: String = ""
-
+    
     private let aiService: AICoachService = .init()
-
-    func sendMessage() {
-        guard !input.isEmpty else { return }
-        messages.append("나: \(input)")
-
-        aiService.sendMessageToAI(input) { [weak self] response in
-            DispatchQueue.main.async {
-                self?.messages.append("AI: \(response)")
+    
+    init() {}
+    
+    func sendMessage(_ text: String? = nil, isUser: Bool = true) {
+        let message = text ?? input
+        guard !message.isEmpty else { return }
+        
+        messages.append((message, isUser))
+        
+        if isUser {
+            aiService.sendMessageToAI(message) { [weak self] response in
+                DispatchQueue.main.async {
+                    self?.messages.append((response, false))
+                }
             }
+            input = ""
         }
-
-        input = ""
     }
 }
+

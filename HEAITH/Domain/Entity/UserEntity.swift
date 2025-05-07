@@ -26,3 +26,15 @@ class UserEntity {
         weight / (1.75 * 1.75)
     }
 }
+
+extension UserEntity {
+    var aiPromptSummary: String {
+        return """
+        이름: \(name)
+        성별: \(gender.rawValue)
+        나이: \(age)세
+        체중: \(weight)kg
+        BMI: \(String(format: "%.2f", bmi))
+        """
+    }
+}

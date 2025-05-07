@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		D11D8AE32DCADEEC000B81EC /* API_KEY.plist in Resources */ = {isa = PBXBuildFile; fileRef = D11D8AE22DCADEEC000B81EC /* API_KEY.plist */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		D11D8A792DCA790C000B81EC /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -17,8 +21,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		D11D8A752DCA790C000B81EC /* HEAITHTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HEAITHTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		D16741952DC1A4C700BFA6E6 /* HEAITH.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HEAITH.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D11D8AE22DCADEEC000B81EC /* API_KEY.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = API_KEY.plist; sourceTree = "<group>"; };
+		D1F876422DCAE624005E6FA0 /* HEAITH.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HEAITH.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D1F876432DCAE624005E6FA0 /* HEAITHTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HEAITHTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -55,19 +60,12 @@
 		D167418C2DC1A4C700BFA6E6 = {
 			isa = PBXGroup;
 			children = (
+				D11D8AE22DCADEEC000B81EC /* API_KEY.plist */,
 				D16741972DC1A4C700BFA6E6 /* HEAITH */,
 				D11D8A762DCA790C000B81EC /* HEAITHTests */,
-				D16741962DC1A4C700BFA6E6 /* Products */,
+				D1F876422DCAE624005E6FA0 /* HEAITH.app */,
+				D1F876432DCAE624005E6FA0 /* HEAITHTests.xctest */,
 			);
-			sourceTree = "<group>";
-		};
-		D16741962DC1A4C700BFA6E6 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				D16741952DC1A4C700BFA6E6 /* HEAITH.app */,
-				D11D8A752DCA790C000B81EC /* HEAITHTests.xctest */,
-			);
-			name = Products;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -93,7 +91,7 @@
 			packageProductDependencies = (
 			);
 			productName = HEAITHTests;
-			productReference = D11D8A752DCA790C000B81EC /* HEAITHTests.xctest */;
+			productReference = D1F876432DCAE624005E6FA0 /* HEAITHTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 		D16741942DC1A4C700BFA6E6 /* HEAITH */ = {
@@ -115,7 +113,7 @@
 			packageProductDependencies = (
 			);
 			productName = HEAITH;
-			productReference = D16741952DC1A4C700BFA6E6 /* HEAITH.app */;
+			productReference = D1F876422DCAE624005E6FA0 /* HEAITH.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -147,7 +145,7 @@
 			mainGroup = D167418C2DC1A4C700BFA6E6;
 			minimizedProjectReferenceProxies = 1;
 			preferredProjectObjectVersion = 77;
-			productRefGroup = D16741962DC1A4C700BFA6E6 /* Products */;
+			productRefGroup = D167418C2DC1A4C700BFA6E6;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -169,6 +167,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D11D8AE32DCADEEC000B81EC /* API_KEY.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

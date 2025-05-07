@@ -8,42 +8,48 @@
 import SwiftUI
 
 struct AICoachView: View {
-    @State private var message = "오늘 운동 추천해줘"
-    @State private var response = ""
+    @State private var viewModel = AICoachViewModel()
 
     var body: some View {
         VStack {
-            Text("AI 피트니스 코치").font(.title)
-
-            Text("입력: \(message)")
-                .padding()
-
-            Text("응답: \(response)")
-                .padding()
-
-            Button("AI에게 물어보기") {
-                Task {
-                    response = await fetchAIResponse(prompt: message)
+            ScrollView {
+                VStack(spacing: 12) {
+                    ForEach(viewModel.messages.indices, id: \.self) { index in
+                        let (text, isUser) = viewModel.messages[index]
+                        HStack {
+                            if isUser {
+                                Spacer()
+                                Text(text)
+                                    .padding()
+                                    .background(Color.blue.opacity(0.2))
+                                    .cornerRadius(10)
+                                    .frame(maxWidth: 250, alignment: .trailing)
+                            } else {
+                                Text(text)
+                                    .padding()
+                                    .background(Color.green.opacity(0.2))
+                                    .cornerRadius(10)
+                                    .frame(maxWidth: 250, alignment: .leading)
+                                Spacer()
+                            }
+                        }
+                        .padding(.horizontal)
+                    }
                 }
             }
+
+            // 입력 필드
+            HStack {
+                TextField("메시지를 입력하세요", text: $viewModel.input)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+
+                Button("보내기") {
+                    viewModel.sendMessage()
+                }
+            }
+            .padding()
         }
-        .padding()
-    }
-
-    func fetchAIResponse(prompt: String) async -> String {
-        guard let url = URL(string: "https://example.com/ai-coach") else { return "URL 오류" }
-
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.httpBody = try? JSONSerialization.data(withJSONObject: ["prompt": prompt])
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-
-        do {
-            let (data, _) = try await URLSession.shared.data(for: request)
-            let result = try JSONDecoder().decode(AlanResponseDTO.self, from: data)
-            return result.content
-        } catch {
-            return "에러: \(error.localizedDescription)"
-        }
+        .navigationTitle("AI 코치")
     }
 }
+
